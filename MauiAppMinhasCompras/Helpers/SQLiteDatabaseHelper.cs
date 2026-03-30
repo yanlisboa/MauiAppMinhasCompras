@@ -39,9 +39,31 @@ namespace MauiAppMinhasCompras.Helpers
 
         public Task<List<Produto>> Search(string q)
         {
-            string sql = "SELECT * Produto WHERE descricao LIKE '%" + q + "%'";
+            string sql = "SELECT * FROM Produto WHERE Descricao LIKE '%" + q + "%'";
 
             return _conn.QueryAsync<Produto>(sql);
+        }
+        public Task<List<Produto>> GetByCategoria(string categoria)
+        {
+            return _conn.Table<Produto>()
+                .Where(p => p.Categoria == categoria)
+                .ToListAsync();
+        }
+
+        public async Task<List<RelatorioCategoria>> GetRelatorioCategoria()
+        {
+            var lista = await _conn.Table<Produto>().ToListAsync();
+
+            var relatorio = lista
+                .GroupBy(p => p.Categoria)
+                .Select(g => new RelatorioCategoria
+                {
+                    Categoria = g.Key,
+                    Total = g.Sum(p => p.Preco * p.Quantidade)
+                })
+                .ToList();
+
+            return relatorio;
         }
     }
 }

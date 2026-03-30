@@ -109,4 +109,26 @@ public partial class ListaProduto : ContentPage
             DisplayAlert("Ops", ex.Message, "OK");
         }
     }
+
+    private async void OnCategoriaChanged(object sender, EventArgs e)
+    {
+        if (pickerCategoria.SelectedItem == null)
+            return;
+
+        string categoria = pickerCategoria.SelectedItem.ToString();
+
+        if (categoria == "Todos")
+        {
+            lst_produtos.ItemsSource = await App.Db.GetAll();
+        }
+        else
+        {
+            lst_produtos.ItemsSource = await App.Db.GetByCategoria(categoria);
+        }
+    }
+     
+        private async void AbrirRelatorio(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new RelatorioPage());
+    }
 }
